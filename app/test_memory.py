@@ -1,4 +1,4 @@
-from memory import Memory
+from .memory import Memory
 
 # Test basique
 memory = Memory()

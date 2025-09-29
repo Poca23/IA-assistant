@@ -1,4 +1,4 @@
-from app.brain import AIBrain
+from .brain import AIBrain
 
 # Test basique
 ai = AIBrain()
