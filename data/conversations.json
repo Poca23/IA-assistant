@@ -1,151 +1,23 @@
 {
-  "conversations": [
-    {
-      "user": "Salut IA",
-      "ai": "Bonjour ! Comment allez-vous ?",
-      "timestamp": "4309812.2"
-    },
-    {
-      "user": "Salut IA",
-      "ai": "Bonjour ! Comment allez-vous ?",
-      "timestamp": "4309821.18"
-    },
-    {
-      "user": "Salut IA",
-      "ai": "Bonjour ! Comment allez-vous ?",
-      "timestamp": "4310030.19"
-    },
-    {
-      "user": "salut !",
-      "ai": "Hey ! Ravi de te voir !",
-      "timestamp": "4311081.94"
-    },
-    {
-      "user": "comment ça va ?",
-      "ai": "Ça va bien, merci ! Et toi ?",
-      "timestamp": "4311081.94"
-    },
-    {
-      "user": "quelle heure est-il ?",
-      "ai": "Peux-tu reformuler ?",
-      "timestamp": "4311081.95"
-    },
-    {
-      "user": "ton nom",
-      "ai": "Je m'appelle Claire-IA !",
-      "timestamp": "4311115.64"
-    },
-    {
-      "user": "salut !",
-      "ai": "Salut ! Comment ça va ?",
-      "timestamp": "4311255.35"
-    },
-    {
-      "user": "comment ça va ?",
-      "ai": "Très bien ! Comment puis-je t'aider ?",
-      "timestamp": "4311255.35"
-    },
-    {
-      "user": "quelle heure est-il ?",
-      "ai": "Je ne comprends pas encore, mais je vais apprendre !",
-      "timestamp": "4311255.39"
-    },
-    {
-      "user": "ton nom",
-      "ai": "Je m'appelle Claire-IA !",
-      "timestamp": "4311265.47"
-    },
-    {
-      "user": "hello",
-      "ai": "Hey ! Ravi de te voir !",
-      "timestamp": "4311683.76"
-    },
-    {
-      "user": "hello",
-      "ai": "Salut ! Comment ça va ?",
-      "timestamp": "4311865.94"
-    },
-    {
-      "user": "Salut IA",
-      "ai": "Bonjour ! Comment allez-vous ?",
-      "timestamp": "4312492.38"
-    },
-    {
-      "user": "Salut IA",
-      "ai": "Bonjour ! Comment allez-vous ?",
-      "timestamp": "4312712.68"
-    },
-    {
-      "user": "Salut IA",
-      "ai": "Bonjour ! Comment allez-vous ?",
-      "timestamp": "4312762.1"
-    },
-    {
-      "user": "Salut IA",
-      "ai": "Bonjour ! Comment allez-vous ?",
-      "timestamp": "4312805.54"
-    },
-    {
-      "user": "Salut IA",
-      "ai": "Bonjour ! Comment allez-vous ?",
-      "timestamp": "4312948.1"
-    },
-    {
-      "user": "Salut IA",
-      "ai": "Bonjour ! Comment allez-vous ?",
-      "timestamp": "4313049.09"
-    },
-    {
-      "user": "test",
-      "ai": "Peux-tu reformuler ?",
-      "timestamp": "4313566.9"
-    },
-    {
-      "user": "Salut IA",
-      "ai": "Bonjour ! Comment allez-vous ?",
-      "timestamp": "4314028.38"
-    },
-    {
-      "user": "salut",
-      "ai": "Hey ! Ravi de te voir !",
-      "timestamp": "4314040.16"
-    },
-    {
-      "user": "comment ça va ?",
-      "ai": "Très bien ! Comment puis-je t'aider ?",
-      "timestamp": "4314040.16"
-    },
-    {
-      "user": "salut !",
-      "ai": "Salut ! Comment ça va ?",
-      "timestamp": "4314048.43"
-    },
-    {
-      "user": "comment ça va ?",
-      "ai": "Ça va bien, merci ! Et toi ?",
-      "timestamp": "4314048.43"
-    },
-    {
-      "user": "quelle heure est-il ?",
-      "ai": "Intéressant ! Dis-moi en plus.",
-      "timestamp": "4314048.44"
-    },
-    {
-      "user": "ton nom",
-      "ai": "Je m'appelle Claire-IA !",
-      "timestamp": "4314059.45"
-    },
-    {
-      "user": "test",
-      "ai": "Intéressant ! Dis-moi en plus.",
-      "timestamp": "4314071.18"
-    }
-  ],
+  "conversations": [],
   "learned_responses": {
     "ton nom": [
-      "Je m'appelle Claire-IA !",
-      "Je m'appelle Claire-IA !",
       "Je m'appelle Claire-IA !"
+    ],
+    "quel âge as-tu ?": [
+      "J'ai 25 ans"
+    ],
+    "quel est mon nom ?": [
+      "Je m'appelle Claire"
+    ],
+    "nom de mon amoureuse": [
+      "Edwina"
+    ],
+    "test automatique": [
+      "réponse automatique"
+    ],
+    "âge": [
+      "36 ans"
     ]
   }
 }
