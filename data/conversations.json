@@ -1,0 +1,15 @@
+{
+  "conversations": [
+    {
+      "user": "Salut IA",
+      "ai": "Bonjour ! Comment allez-vous ?",
+      "timestamp": "4309812.2"
+    },
+    {
+      "user": "Salut IA",
+      "ai": "Bonjour ! Comment allez-vous ?",
+      "timestamp": "4309821.18"
+    }
+  ],
+  "learned_responses": {}
+}
