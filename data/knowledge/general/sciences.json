@@ -1,0 +1,19 @@
+{
+  "entries": [
+    {
+      "id": "73a69b3d",
+      "question": "Formule eau ?",
+      "answer": "H2O",
+      "tags": [
+        "chimie"
+      ],
+      "created": "2025-09-30 19:18:21",
+      "updated": "2025-09-30 19:18:21"
+    }
+  ],
+  "metadata": {
+    "category": "sciences",
+    "total_entries": 1,
+    "last_updated": "2025-09-30 19:18:21"
+  }
+}
