@@ -20,7 +20,6 @@ class KnowledgeBase:
             
             for subcategory in subcategories:
                 file_path = os.path.join(category_path, f"{subcategory}.json")
-                # TOUJOURS recréer si vide ou inexistant
                 if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
                     self._create_empty_file(file_path, subcategory)
     
@@ -43,7 +42,6 @@ class KnowledgeBase:
         try:
             file_path = os.path.join(self.base_path, category, f"{subcategory}.json")
             
-            # Vérifier si fichier vide AVANT lecture
             if os.path.getsize(file_path) == 0:
                 self._create_empty_file(file_path, subcategory)
             
@@ -77,7 +75,6 @@ class KnowledgeBase:
         try:
             file_path = os.path.join(self.base_path, category, f"{subcategory}.json")
             
-            # Vérifier si fichier vide AVANT lecture
             if os.path.getsize(file_path) == 0:
                 self._create_empty_file(file_path, subcategory)
             
@@ -89,3 +86,67 @@ class KnowledgeBase:
         except Exception as e:
             print(f"❌ Erreur lecture : {e}")
             return {"entries": [], "metadata": {"total_entries": 0}}
+
+    def update_entry(self, category, subcategory, entry_id, question=None, answer=None, tags=None):
+        """Modifier entrée existante"""
+        try:
+            file_path = os.path.join(self.base_path, category, f"{subcategory}.json")
+            
+            if os.path.getsize(file_path) == 0:
+                return False
+            
+            with open(file_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            for entry in data["entries"]:
+                if entry["id"] == entry_id:
+                    if question: entry["question"] = question
+                    if answer: entry["answer"] = answer
+                    if tags is not None: entry["tags"] = tags
+                    entry["updated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    
+                    data["metadata"]["last_updated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    
+                    with open(file_path, 'w', encoding='utf-8') as f:
+                        json.dump(data, f, ensure_ascii=False, indent=2)
+                    
+                    return True
+            
+            return False
+        
+        except Exception as e:
+            print(f"❌ Erreur modification : {e}")
+            return False
+    
+    def delete_entry(self, category, subcategory, entry_id):
+        """Supprimer entrée"""
+        try:
+            file_path = os.path.join(self.base_path, category, f"{subcategory}.json")
+            
+            if os.path.getsize(file_path) == 0:
+                return False
+            
+            with open(file_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            initial_count = len(data["entries"])
+            data["entries"] = [e for e in data["entries"] if e["id"] != entry_id]
+            
+            if len(data["entries"]) < initial_count:
+                data["metadata"]["total_entries"] = len(data["entries"])
+                data["metadata"]["last_updated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+                
+                return True
+            
+            return False
+        
+        except Exception as e:
+            print(f"❌ Erreur suppression : {e}")
+            return False
+    
+    def list_categories(self):
+        """Lister toutes les catégories disponibles"""
+        return self.categories

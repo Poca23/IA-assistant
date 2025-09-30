@@ -9,11 +9,21 @@
       ],
       "created": "2025-09-30 19:18:21",
       "updated": "2025-09-30 19:18:21"
+    },
+    {
+      "id": "8a810725",
+      "question": "Recette pâtes ?",
+      "answer": "Eau + sel + pâtes",
+      "tags": [
+        "facile"
+      ],
+      "created": "2025-09-30 20:05:55",
+      "updated": "2025-09-30 20:05:55"
     }
   ],
   "metadata": {
     "category": "cuisine",
-    "total_entries": 1,
-    "last_updated": "2025-09-30 19:18:21"
+    "total_entries": 2,
+    "last_updated": "2025-09-30 20:05:55"
   }
 }

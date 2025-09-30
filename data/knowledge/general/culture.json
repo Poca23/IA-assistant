@@ -10,11 +10,22 @@
       ],
       "created": "2025-09-30 19:18:21",
       "updated": "2025-09-30 19:18:21"
+    },
+    {
+      "id": "b49a3847",
+      "question": "Qui a peint La Joconde ?",
+      "answer": "Léonard de Vinci (1503-1519)",
+      "tags": [
+        "art",
+        "renaissance"
+      ],
+      "created": "2025-09-30 20:05:55",
+      "updated": "2025-09-30 20:05:55"
     }
   ],
   "metadata": {
     "category": "culture",
-    "total_entries": 1,
-    "last_updated": "2025-09-30 19:18:21"
+    "total_entries": 2,
+    "last_updated": "2025-09-30 20:05:55"
   }
 }
