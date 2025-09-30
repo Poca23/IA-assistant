@@ -1,4 +1,3 @@
-# app/brain.py - Cœur IA avec mémoire intégrée optimisé
 import json
 import random
 import re
@@ -36,10 +35,8 @@ class AIBrain:
         if not user_input:
             return ""
         
-        # Convertir en minuscules et supprimer les espaces
         cleaned = user_input.lower().strip()
         
-        # Supprimer les caractères spéciaux excessifs
         cleaned = re.sub(r'[^\w\s\-àéèêëîïôöùûüÿç]', '', cleaned)
         
         return cleaned
@@ -47,7 +44,6 @@ class AIBrain:
     def get_response(self, user_input):
         """Générer une réponse avec gestion d'erreurs renforcée"""
         try:
-            # Validation et nettoyage de l'entrée
             if not user_input or len(user_input.strip()) == 0:
                 return "Pardon, je n'ai rien entendu. Pouvez-vous répéter ?"
             
@@ -56,13 +52,11 @@ class AIBrain:
             if len(cleaned_input) == 0:
                 return "Je n'ai pas bien compris. Pouvez-vous reformuler ?"
             
-            # Recherche dans les réponses apprises
             try:
                 learned = self.memory.get_learned_responses()
                 if cleaned_input in learned and learned[cleaned_input]:
                     response = random.choice(learned[cleaned_input])
                 else:
-                    # Recherche partielle dans les réponses apprises
                     partial_match = None
                     for learned_key in learned.keys():
                         if cleaned_input in learned_key or learned_key in cleaned_input:
@@ -73,14 +67,12 @@ class AIBrain:
                     if partial_match:
                         response = partial_match
                     else:
-                        # Réponses par motifs simples
                         response = self._get_pattern_response(cleaned_input)
                         
             except Exception as memory_error:
                 print(f"❌ Erreur mémoire : {memory_error}")
                 response = self._get_pattern_response(cleaned_input)
             
-            # Sauvegarder la conversation
             try:
                 self.memory.save_conversation(user_input, response)
             except Exception as save_error:
@@ -95,23 +87,18 @@ class AIBrain:
     def _get_pattern_response(self, cleaned_input):
         """Générer une réponse basée sur des motifs"""
         try:
-            # Mots-clés de salutation
             if any(word in cleaned_input for word in ["salut", "hello", "bonjour", "hey", "hi"]):
                 return random.choice(self.responses["salut"])
             
-            # Mots-clés de conversation
             elif any(word in cleaned_input for word in ["comment", "ça va", "ca va", "vas tu"]):
                 return random.choice(self.responses["comment"])
             
-            # Mots-clés de remerciement
             elif any(word in cleaned_input for word in ["merci", "thank", "thanks"]):
                 return "De rien ! Je suis là pour ça !"
             
-            # Mots-clés d'au revoir
             elif any(word in cleaned_input for word in ["au revoir", "bye", "à bientôt", "tchao", "ciao"]):
                 return "Au revoir ! À bientôt !"
             
-            # Réponse par défaut
             else:
                 return random.choice(self.responses["default"])
                 
@@ -131,20 +118,17 @@ class AIBrain:
             print(f"❌ Erreur stats : {e}")
             return {'conversations': 0, 'learned_responses': 0}
 
-# Test du module
 if __name__ == "__main__":
     print("=== TEST MODULE BRAIN ===")
     try:
         ai = AIBrain()
         
-        # Tests de base
         test_inputs = ["salut", "comment ça va ?", "merci", "question inconnue"]
         
         for test_input in test_inputs:
             response = ai.get_response(test_input)
             print(f"✅ '{test_input}' → '{response}'")
         
-        # Test stats
         stats = ai.get_stats()
         print(f"✅ Stats : {stats}")
         

@@ -1,10 +1,8 @@
-# app/interface.py - Interface web Streamlit SANS boucle infinie
 import streamlit as st
 import time
 from app.brain import AIBrain
 from app.learning import teach_ai
 
-# Configuration page
 st.set_page_config(
     page_title="Claire-IA Conversationnelle",
     page_icon="🤖",
@@ -12,17 +10,14 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Initialisation IA
 @st.cache_resource
 def init_ai():
     return AIBrain()
 
 def main():
-    # Header
     st.title("🤖 Claire-IA Conversationnelle")
     st.markdown("*Votre première IA qui apprend !*")
     
-    # CSS pour éviter erreurs console
     st.markdown("""
     <style>
     .stApp { max-width: 100%; }
@@ -31,7 +26,6 @@ def main():
     </style>
     """, unsafe_allow_html=True)
     
-    # Initialiser l'historique de session
     if "messages" not in st.session_state:
         st.session_state.messages = []
         st.session_state.messages.append({
@@ -39,44 +33,36 @@ def main():
             "content": "Salut ! Je suis Claire-IA. Comment puis-je t'aider ?"
         })
     
-    # Afficher l'historique des messages
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
     
-    # Input utilisateur
     if prompt := st.chat_input("Écris ton message..."):
-        # Afficher le message utilisateur
         with st.chat_message("user"):
             st.markdown(prompt)
         st.session_state.messages.append({"role": "user", "content": prompt})
         
-        # Générer et afficher la réponse IA
         with st.chat_message("assistant"):
             with st.spinner("Je réfléchis..."):
-                ai = AIBrain()  # Nouvelle instance à chaque fois
+                ai = AIBrain()
                 response = ai.get_response(prompt)
                 st.markdown(response)
         st.session_state.messages.append({"role": "assistant", "content": response})
     
-    # Sidebar - Fonctionnalités
     with st.sidebar:
         st.header("🧠 Contrôles IA")
         
-        # Section apprentissage
         st.subheader("📚 Enseigner à l'IA")
         question = st.text_input("Question :", key="learn_question")
         answer = st.text_input("Réponse :", key="learn_answer")
         
-        # Bouton Apprendre SANS st.rerun()
         if st.button("🎓 Apprendre"):
             if question and answer:
                 try:
                     success = teach_ai(question, answer)
                     if success:
                         st.success(f"✅ Claire-IA a appris !\n**Q:** {question}\n**R:** {answer}")
-                        # PLUS DE st.rerun() ici !
-                        st.balloons()  # Animation de succès
+                        st.balloons()
                     else:
                         st.error("❌ Erreur durant l'apprentissage")
                 except Exception as e:
@@ -84,7 +70,6 @@ def main():
             else:
                 st.error("⚠️ Veuillez remplir les deux champs")
         
-        # Stats rechargées automatiquement
         st.subheader("📊 Statistiques")
         try:
             ai_stats = AIBrain()
@@ -94,7 +79,6 @@ def main():
         except Exception as e:
             st.error(f"❌ Erreur stats : {str(e)}")
         
-        # Clear conversation SANS st.rerun()
         if st.button("🗑️ Nouvelle conversation"):
             st.session_state.messages = []
             st.session_state.messages.append({

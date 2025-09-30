@@ -1,4 +1,3 @@
-# app/brain.py - Cœur IA (15 lignes)
 import json
 import random
 from sklearn.feature_extraction.text import TfidfVectorizer
