@@ -1,5 +1,7 @@
 import streamlit as st
 import os
+import json
+from datetime import datetime
 from .brain import AIBrain
 from .learning import teach_ai
 from .knowledge import KnowledgeBase
@@ -48,7 +50,7 @@ def knowledge_interface():
     """Onglet Connaissances - Visualisation et gestion"""
     st.header("📚 Base de Connaissances")
     
-    kb = init_kb()
+    kb = KnowledgeBase()
     categories = kb.list_categories()
     
     col1, col2 = st.columns([1, 3])
@@ -89,11 +91,11 @@ def knowledge_interface():
     with col2:
         if selected_cat and selected_subcat:
             st.subheader(f"📖 {selected_cat.title()} / {selected_subcat.title()}")
-            
+
             try:
                 # Lecture sécurisée avec validation de type
                 result = kb.read_entries(selected_cat, selected_subcat)
-                
+
                 # Vérification du type de retour
                 if isinstance(result, str):
                     st.error(f"❌ Erreur format : {result}")
@@ -162,13 +164,152 @@ def stats_interface():
         st.error(f"❌ Erreur chargement stats : {str(e)}")
 
 def admin_interface():
-    """Onglet Gestion - Administration et apprentissage"""
-    st.header("⚙️ Gestion IA")
+    """Onglet Gestion - Import/Export/Maintenance"""
+    st.header("🔧 Gestion des Connaissances")
     
-    tab1, tab2 = st.tabs(["🎓 Apprentissage", "🔧 Maintenance"])
+    tab1, tab2, tab3 = st.tabs(["📥 Import", "📤 Export", "🧹 Maintenance"])
     
+    # TAB 1 : IMPORT JSON
     with tab1:
-        st.subheader("📚 Enseigner à l'IA")
+        st.subheader("📥 Importer des Connaissances")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            category = st.selectbox(
+                "Catégorie",
+                ["general", "personal"],
+                key="import_category"
+            )
+        
+        with col2:
+            if category == "general":
+                subcategories = ["culture", "sciences", "technologies"]
+            else:
+                subcategories = ["cuisine", "admin", "sante", "budget"]
+            
+            subcategory = st.selectbox(
+                "Sous-catégorie",
+                subcategories,
+                key="import_subcategory"
+            )
+        
+        uploaded_file = st.file_uploader(
+            "Choisir un fichier JSON",
+            type=["json"],
+            help="Format attendu : {'entries': [{'question': '...', 'answer': '...'}]}"
+        )
+        
+        if uploaded_file is not None:
+            # Afficher aperçu
+            file_content = uploaded_file.read().decode("utf-8")
+            
+            with st.expander("📄 Aperçu du fichier"):
+                try:
+                    preview_data = json.loads(file_content)
+                    st.json(preview_data)
+                except:
+                    st.error("❌ Fichier JSON invalide")
+            
+            # Bouton d'import
+            if st.button("🚀 Importer", type="primary"):
+                from .import_handler import ImportHandler
+                
+                handler = ImportHandler()
+                success, message, count = handler.import_from_json(
+                    file_content, 
+                    category, 
+                    subcategory
+                )
+                
+                if success:
+                    st.success(f"✅ {message}")
+                    st.balloons()
+                else:
+                    st.error(f"❌ {message}")
+    
+    # TAB 2 : EXPORT JSON
+    with tab2:
+        st.subheader("📤 Exporter des Connaissances")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            export_category = st.selectbox(
+                "Catégorie",
+                ["general", "personal"],
+                key="export_category"
+            )
+        
+        with col2:
+            if export_category == "general":
+                export_subcategories = ["culture", "sciences", "technologies"]
+            else:
+                export_subcategories = ["cuisine", "admin", "sante", "budget"]
+            
+            export_subcategory = st.selectbox(
+                "Sous-catégorie",
+                export_subcategories,
+                key="export_subcategory"
+            )
+        
+        if st.button("📥 Télécharger JSON"):
+            kb = KnowledgeBase()
+            entries = kb.read_entries(export_category, export_subcategory)
+            
+            if entries and isinstance(entries, list):
+                export_data = {
+                    "entries": entries,
+                    "metadata": {
+                        "category": export_category,
+                        "subcategory": export_subcategory,
+                        "total_entries": len(entries),
+                        "exported": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    }
+                }
+                
+                json_str = json.dumps(export_data, indent=2, ensure_ascii=False)
+                
+                st.download_button(
+                    label="💾 Télécharger",
+                    data=json_str,
+                    file_name=f"{export_category}_{export_subcategory}_{datetime.now().strftime('%Y%m%d')}.json",
+                    mime="application/json"
+                )
+                st.success(f"✅ Prêt à télécharger ({len(entries)} entrées)")
+            else:
+                st.warning("⚠️ Aucune entrée à exporter")
+    
+    # TAB 3 : MAINTENANCE
+    with tab3:
+        st.subheader("🧹 Maintenance")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            if st.button("🆕 Nouvelle Conversation"):
+                st.session_state.messages = []
+                st.session_state.messages.append({
+                    "role": "assistant", 
+                    "content": "Nouvelle conversation ! Comment puis-je t'aider ?"
+                })
+                st.success("✅ Conversation réinitialisée")
+                st.rerun()
+        
+        with col2:
+            if st.button("📊 Statistiques Cache"):
+                st.info("Cache Streamlit actif")
+        
+        with col3:
+            if st.button("🔄 Recharger Données"):
+                st.cache_resource.clear()
+                st.success("✅ Cache vidé")
+                st.rerun()
+        
+        st.divider()
+        
+        # Section Apprentissage (conservée)
+        st.subheader("🎓 Enseigner à l'IA")
         question = st.text_input("Question :", key="learn_question")
         answer = st.text_input("Réponse :", key="learn_answer")
         
@@ -185,20 +326,6 @@ def admin_interface():
                     st.error(f"❌ Erreur : {str(e)}")
             else:
                 st.error("⚠️ Veuillez remplir les deux champs")
-    
-    with tab2:
-        st.subheader("🗑️ Actions")
-        
-        if st.button("🆕 Nouvelle conversation"):
-            st.session_state.messages = []
-            st.session_state.messages.append({
-                "role": "assistant", 
-                "content": "Nouvelle conversation ! Comment puis-je t'aider ?"
-            })
-            st.success("✅ Conversation effacée !")
-        
-        st.divider()
-        st.info("🚧 Import/Export JSON - À venir en Étape 23B")
 
 def main():
     st.title("🤖 Claire-IA Conversationnelle")

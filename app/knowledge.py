@@ -74,18 +74,17 @@ class KnowledgeBase:
         """Lire toutes les entrées"""
         try:
             file_path = os.path.join(self.base_path, category, f"{subcategory}.json")
-            
+
             if os.path.getsize(file_path) == 0:
                 self._create_empty_file(file_path, subcategory)
-            
+
             with open(file_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-            
-            return data
-        
+
+            return data.get("entries", [])
         except Exception as e:
             print(f"❌ Erreur lecture : {e}")
-            return {"entries": [], "metadata": {"total_entries": 0}}
+            return []
 
     def update_entry(self, category, subcategory, entry_id, question=None, answer=None, tags=None):
         """Modifier entrée existante"""

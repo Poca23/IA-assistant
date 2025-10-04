@@ -1,17 +1,6 @@
 {
   "entries": [
     {
-      "id": "729bc491",
-      "question": "Qui a peint La Joconde ?",
-      "answer": "Léonard de Vinci",
-      "tags": [
-        "art",
-        "renaissance"
-      ],
-      "created": "2025-09-30 19:18:21",
-      "updated": "2025-09-30 19:18:21"
-    },
-    {
       "id": "b49a3847",
       "question": "Qui a peint La Joconde ?",
       "answer": "Léonard de Vinci (1503-1519)",
@@ -21,11 +10,35 @@
       ],
       "created": "2025-09-30 20:05:55",
       "updated": "2025-09-30 20:05:55"
+    },
+    {
+      "id": "7b841e89",
+      "question": "Qu'est-ce que Python ?",
+      "answer": "Python est un langage de programmation interprété, orienté objet et de haut niveau.",
+      "tags": [],
+      "created": "2025-10-04 10:35:28",
+      "updated": "2025-10-04 10:35:28"
+    },
+    {
+      "id": "add9ad7d",
+      "question": "Qu'est-ce que l'IA ?",
+      "answer": "L'Intelligence Artificielle (IA) est la simulation de processus d'intelligence humaine par des machines.",
+      "tags": [],
+      "created": "2025-10-04 10:35:28",
+      "updated": "2025-10-04 10:35:28"
+    },
+    {
+      "id": "4e7886d6",
+      "question": "Qu'est-ce que Streamlit ?",
+      "answer": "Streamlit est un framework Python pour créer rapidement des applications web interactives.",
+      "tags": [],
+      "created": "2025-10-04 10:35:29",
+      "updated": "2025-10-04 10:35:29"
     }
   ],
   "metadata": {
     "category": "culture",
-    "total_entries": 2,
-    "last_updated": "2025-09-30 20:05:55"
+    "total_entries": 5,
+    "last_updated": "2025-10-04 10:35:29"
   }
 }
