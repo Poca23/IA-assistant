@@ -22,3 +22,15 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Backups générés
+data/backups/
+*.zip
+
+# Exports générés
+data/exports/
+export_*.json
+
+# Logs opérations
+data/logs/
+operations.log

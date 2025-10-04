@@ -3,9 +3,12 @@ import streamlit as st
 import os
 import json
 from datetime import datetime
+from pathlib import Path
 from .brain import AIBrain
 from .learning import teach_ai
 from .knowledge import KnowledgeBase
+from .sync_import import SyncImport
+from .sync_export import SyncExport
 
 st.set_page_config(
     page_title="BB-IA",
@@ -21,6 +24,14 @@ def init_ai():
 @st.cache_resource
 def init_kb():
     return KnowledgeBase()
+
+@st.cache_resource
+def init_sync_import():
+    return SyncImport()
+
+@st.cache_resource
+def init_sync_export():
+    return SyncExport()
 
 def chat_interface():
     """Onglet Chat - Interface conversationnelle"""
@@ -272,22 +283,21 @@ def stats_interface():
 
 def import_advanced_interface():
     """Import avancé avec preview"""
-    from .sync_import import SyncImport
-    
     st.subheader("📥 Import Avancé")
     
     col1, col2 = st.columns(2)
     with col1:
-        category = st.selectbox("Catégorie", ["general", "personal"])
+        category = st.selectbox("Catégorie", ["general", "personal"], key="import_cat")
     with col2:
         subcategory = st.text_input("Sous-catégorie", 
-                                     placeholder="ex: technologies")
+                                     placeholder="ex: technologies",
+                                     key="import_subcat")
     
-    uploaded = st.file_uploader("Sélectionner JSON", type=["json"])
+    uploaded = st.file_uploader("Sélectionner JSON", type=["json"], key="import_file")
     
     if uploaded and subcategory:
         content = uploaded.read().decode("utf-8")
-        sync = SyncImport()
+        sync = init_sync_import()
         
         with st.spinner("Analyse du fichier..."):
             preview = sync.preview_import(content, category, subcategory)
@@ -312,7 +322,8 @@ def import_advanced_interface():
         
         if preview["new"] > 0:
             if st.button("✅ Importer les nouvelles entrées", 
-                        type="primary"):
+                        type="primary",
+                        key="import_btn"):
                 result = sync.merge_import(
                     category, subcategory,
                     preview["entries_to_import"]
@@ -326,110 +337,271 @@ def import_advanced_interface():
         else:
             st.info("ℹ️ Aucune nouvelle entrée à importer")
 
-def admin_interface():
-    """Onglet Gestion - Outils maintenance"""
-    st.header("⚙️ Gestion")
+def export_interface():
+    """Tab Export & Backup"""
+    st.subheader("📤 Export & Backup")
     
-    tab1, tab2, tab3 = st.tabs(["📥 Import Avancé", "📤 Export", "🧹 Maintenance"])
+    sync_export = init_sync_export()
     
-    with tab1:
-        import_advanced_interface()
-    
-    with tab2:
-        st.subheader("📤 Exporter des Connaissances")
-        
+    # Section 1 : Export Filtré
+    with st.expander("🔍 Export Filtré", expanded=True):
         col1, col2 = st.columns(2)
         
         with col1:
             export_category = st.selectbox(
                 "Catégorie",
-                ["general", "personal"],
-                key="export_category"
+                ["Toutes", "general", "personal"],
+                key="export_filter_cat"
+            )
+            export_tags = st.text_input(
+                "Tags (séparés par virgules)",
+                key="export_tags",
+                placeholder="ex: python, ia"
             )
         
         with col2:
-            if export_category == "general":
-                export_subcategories = ["culture", "sciences", "technologies"]
-            else:
-                export_subcategories = ["cuisine", "admin", "sante", "budget"]
-            
-            export_subcategory = st.selectbox(
-                "Sous-catégorie",
-                export_subcategories,
-                key="export_subcategory"
+            export_subcategory = st.text_input(
+                "Sous-catégorie (optionnel)",
+                key="export_subcat",
+                placeholder="ex: technologies"
+            )
+            export_date_from = st.date_input(
+                "Date début (optionnel)",
+                value=None,
+                key="export_date_from"
             )
         
-        if st.button("📥 Télécharger JSON"):
-            kb = init_kb()
-            entries = kb.read_entries(export_category, export_subcategory)
-            
-            if entries and isinstance(entries, list):
-                export_data = {
-                    "entries": entries,
-                    "metadata": {
-                        "category": export_category,
-                        "subcategory": export_subcategory,
-                        "total_entries": len(entries),
-                        "exported": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    }
-                }
+        if st.button("📥 Générer Export", type="primary", key="export_btn"):
+            with st.spinner("Génération export..."):
+                # Préparation filtres
+                cat_filter = None if export_category == "Toutes" else export_category
+                subcat_filter = export_subcategory if export_subcategory else None
+                tags_filter = [t.strip() for t in export_tags.split(",")] if export_tags else None
+                date_filter = export_date_from.strftime("%Y-%m-%d") if export_date_from else None
                 
-                json_str = json.dumps(export_data, indent=2, ensure_ascii=False)
-                
-                st.download_button(
-                    label="💾 Télécharger",
-                    data=json_str,
-                    file_name=f"{export_category}_{export_subcategory}_{datetime.now().strftime('%Y%m%d')}.json",
-                    mime="application/json"
+                success, message, data = sync_export.export_by_filters(
+                    category=cat_filter,
+                    subcategory=subcat_filter,
+                    tags=tags_filter,
+                    date_from=date_filter
                 )
-                st.success(f"✅ Prêt à télécharger ({len(entries)} entrées)")
-            else:
-                st.warning("⚠️ Aucune entrée à exporter")
+                
+                if success and data:
+                    st.success(message)
+                    
+                    # Preview
+                    with st.expander("👁️ Aperçu Export"):
+                        st.json({
+                            "total_entries": data["metadata"]["total_entries"],
+                            "filtres_appliqués": data["metadata"]["filters"],
+                            "premiere_entree": data["entries"][0] if data["entries"] else None
+                        })
+                    
+                    # Bouton téléchargement
+                    json_str = json.dumps(data, indent=2, ensure_ascii=False)
+                    
+                    st.download_button(
+                        "💾 Télécharger Export JSON",
+                        data=json_str,
+                        file_name=f"export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+                        mime="application/json",
+                        key="download_export"
+                    )
+                else:
+                    st.error(message)
     
-    with tab3:
-        st.subheader("🧹 Maintenance")
+    st.divider()
+    
+    # Section 2 : Backup Complet
+    with st.expander("💾 Backup Complet"):
+        st.info("📦 Créer un backup complet de la Knowledge Base (ZIP)")
         
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns([2, 1])
         
         with col1:
-            if st.button("🆕 Nouvelle Conversation"):
-                st.session_state.messages = []
-                st.session_state.messages.append({
-                    "role": "assistant", 
-                    "content": "Nouvelle conversation ! Comment puis-je t'aider ?"
-                })
-                st.success("✅ Conversation réinitialisée")
-                st.rerun()
-        
-        with col2:
-            if st.button("📊 Statistiques Cache"):
-                st.info("Cache Streamlit actif")
-        
-        with col3:
-            if st.button("🔄 Recharger Données"):
-                st.cache_resource.clear()
-                st.success("✅ Cache vidé")
-                st.rerun()
-        
-        st.divider()
-        
-        st.subheader("🎓 Enseigner à l'IA")
-        question = st.text_input("Question :", key="learn_question")
-        answer = st.text_input("Réponse :", key="learn_answer")
-        
-        if st.button("🎓 Apprendre", type="primary"):
-            if question and answer:
-                try:
-                    success = teach_ai(question, answer)
-                    if success:
-                        st.success(f"✅ BB-IA a appris !\n**Q:** {question}\n**R:** {answer}")
-                        st.balloons()
+            if st.button("🔄 Créer Backup", type="primary", key="backup_btn"):
+                with st.spinner("Création backup..."):
+                    success, message, backup_path = sync_export.backup_full_knowledge()
+                    
+                    if success and backup_path:
+                        st.success(message)
+                        
+                        # Stats backup
+                        backup_file = Path(backup_path)
+                        size_mb = round(backup_file.stat().st_size / (1024*1024), 2)
+                        
+                        col_stat1, col_stat2 = st.columns(2)
+                        col_stat1.metric("📦 Taille", f"{size_mb} MB")
+                        col_stat2.metric("📅 Créé", datetime.now().strftime("%H:%M:%S"))
+                        
+                        # Bouton téléchargement
+                        with open(backup_path, "rb") as f:
+                            st.download_button(
+                                "📥 Télécharger Backup ZIP",
+                                data=f,
+                                file_name=backup_file.name,
+                                mime="application/zip",
+                                key="download_backup"
+                            )
                     else:
-                        st.error("❌ Erreur durant l'apprentissage")
-                except Exception as e:
-                    st.error(f"❌ Erreur : {str(e)}")
+                        st.error(message)
+    
+    st.divider()
+    
+    # Section 3 : Restauration
+    with st.expander("📦 Restauration Backup"):
+        backups_list = sync_export.get_backups_list()
+        
+        if backups_list:
+            st.info(f"💾 {len(backups_list)} backup(s) disponible(s)")
+            
+            # Sélection backup
+            backup_options = [
+                f"{b['filename']} - {b['size_mb']} MB - {b['created']}"
+                for b in backups_list
+            ]
+            
+            selected_backup_idx = st.selectbox(
+                "Sélectionner un backup",
+                range(len(backup_options)),
+                format_func=lambda x: backup_options[x],
+                key="restore_select"
+            )
+            
+            selected_backup = backups_list[selected_backup_idx]
+            
+            # Mode restauration
+            restore_mode = st.radio(
+                "Mode de restauration",
+                ["merge", "replace"],
+                format_func=lambda x: "🔀 Fusion (ajoute nouvelles)" if x == "merge" else "🔄 Remplacement (écrase tout)",
+                key="restore_mode"
+            )
+            
+            st.warning(
+                "⚠️ **ATTENTION :** Le mode 'replace' supprimera toutes les données actuelles !"
+                if restore_mode == "replace"
+                else "ℹ️ Les doublons seront ignorés en mode 'merge'"
+            )
+            
+            if st.button("🔄 Restaurer", type="primary", key="restore_btn"):
+                with st.spinner("Restauration en cours..."):
+                    success, message, stats = sync_export.restore_from_backup(
+                        selected_backup["path"],
+                        mode=restore_mode
+                    )
+                    
+                    if success:
+                        st.success(message)
+                        
+                        col1, col2, col3 = st.columns(3)
+                        col1.metric("📁 Fichiers", stats.get('files_restored', 0))
+                        col2.metric("📊 Entrées", stats.get('entries_restored', 0))
+                        col3.metric("⏱️ Durée", f"{stats.get('duration', 0):.2f}s")
+                        
+                        st.balloons()
+                        st.rerun()
+                    else:
+                        st.error(message)
+        else:
+            st.warning("📭 Aucun backup disponible")
+    
+    st.divider()
+    
+    # Section 4 : Historique Opérations
+    with st.expander("📊 Historique Opérations"):
+        logs_file = sync_export.logs_file
+        
+        if logs_file.exists():
+            with open(logs_file, 'r', encoding='utf-8') as f:
+                logs = json.load(f)
+            
+            if logs:
+                st.info(f"📝 {len(logs)} opération(s) enregistrée(s)")
+                
+                # Tableau logs
+                for log in reversed(logs[-10:]):  # 10 derniers
+                    with st.container():
+                        col1, col2, col3 = st.columns([2, 1, 1])
+                        
+                        col1.markdown(f"**{log['operation']}**")
+                        col2.markdown(f"📊 {log['count']} entrées")
+                        col3.markdown(f"🕒 {log['timestamp'][:19]}")
+                        
+                        if log.get('details'):
+                            with st.expander("Détails"):
+                                st.json(log['details'])
+                        
+                        st.divider()
             else:
-                st.error("⚠️ Veuillez remplir les deux champs")
+                st.info("📭 Aucune opération enregistrée")
+        else:
+            st.info("📭 Fichier logs non trouvé")
+
+def maintenance_interface():
+    """Tab Maintenance"""
+    st.subheader("🧹 Maintenance")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        if st.button("🆕 Nouvelle Conversation", key="new_conv"):
+            st.session_state.messages = []
+            st.session_state.messages.append({
+                "role": "assistant", 
+                "content": "Nouvelle conversation ! Comment puis-je t'aider ?"
+            })
+            st.success("✅ Conversation réinitialisée")
+            st.rerun()
+    
+    with col2:
+        if st.button("📊 Statistiques Cache", key="cache_stats"):
+            st.info("Cache Streamlit actif")
+    
+    with col3:
+        if st.button("🔄 Recharger Données", key="reload_data"):
+            st.cache_resource.clear()
+            st.success("✅ Cache vidé")
+            st.rerun()
+    
+    st.divider()
+    
+    st.subheader("🎓 Enseigner à l'IA")
+    question = st.text_input("Question :", key="learn_question")
+    answer = st.text_input("Réponse :", key="learn_answer")
+    
+    if st.button("🎓 Apprendre", type="primary", key="teach_btn"):
+        if question and answer:
+            try:
+                success = teach_ai(question, answer)
+                if success:
+                    st.success(f"✅ BB-IA a appris !\n**Q:** {question}\n**R:** {answer}")
+                    st.balloons()
+                else:
+                    st.error("❌ Erreur durant l'apprentissage")
+            except Exception as e:
+                st.error(f"❌ Erreur : {str(e)}")
+        else:
+            st.error("⚠️ Veuillez remplir les deux champs")
+
+def admin_interface():
+    """Onglet Gestion - Outils maintenance"""
+    st.header("⚙️ Gestion")
+    
+    tab1, tab2, tab3 = st.tabs([
+        "📥 Import Avancé", 
+        "📤 Export & Backup", 
+        "🧹 Maintenance"
+    ])
+    
+    with tab1:
+        import_advanced_interface()
+    
+    with tab2:
+        export_interface()
+    
+    with tab3:
+        maintenance_interface()
 
 def main():
     st.title("🤖 BB-IA")
