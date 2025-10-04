@@ -1,5 +1,16 @@
 {
-  "conversations": [],
+  "conversations": [
+    {
+      "user": "Qu'est-ce que l'eau ?",
+      "ai": "Intéressant ! Dis-moi en plus.",
+      "timestamp": "2025-10-04 11:19:42"
+    },
+    {
+      "user": "eau",
+      "ai": "Peux-tu reformuler ?",
+      "timestamp": "2025-10-04 11:19:45"
+    }
+  ],
   "learned_responses": {
     "ton nom": [
       "Je m'appelle Claire-IA !"
