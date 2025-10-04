@@ -8,7 +8,7 @@ from .learning import teach_ai
 from .knowledge import KnowledgeBase
 
 st.set_page_config(
-    page_title="Claire-IA Conversationnelle",
+    page_title="BB-IA",
     page_icon="🤖",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -28,7 +28,7 @@ def chat_interface():
         st.session_state.messages = []
         st.session_state.messages.append({
             "role": "assistant", 
-            "content": "Salut ! Je suis Claire-IA. Comment puis-je t'aider ?"
+            "content": "Salut ! Je suis BB-IA. Comment puis-je t'aider ?"
         })
 
     for message in st.session_state.messages:
@@ -432,7 +432,7 @@ def admin_interface():
                 try:
                     success = teach_ai(question, answer)
                     if success:
-                        st.success(f"✅ Claire-IA a appris !\n**Q:** {question}\n**R:** {answer}")
+                        st.success(f"✅ BB-IA a appris !\n**Q:** {question}\n**R:** {answer}")
                         st.balloons()
                     else:
                         st.error("❌ Erreur durant l'apprentissage")
@@ -442,7 +442,7 @@ def admin_interface():
                 st.error("⚠️ Veuillez remplir les deux champs")
 
 def main():
-    st.title("🤖 Claire-IA Conversationnelle")
+    st.title("🤖 BB-IA")
     st.markdown("*Votre première IA qui apprend !*")
 
     st.markdown("""

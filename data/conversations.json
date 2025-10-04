@@ -9,11 +9,16 @@
       "user": "eau",
       "ai": "Peux-tu reformuler ?",
       "timestamp": "2025-10-04 11:19:45"
+    },
+    {
+      "user": "Quel est ton nom ?",
+      "ai": "Je m'appelle BB-IA !",
+      "timestamp": "2025-10-04 15:14:12"
     }
   ],
   "learned_responses": {
     "ton nom": [
-      "Je m'appelle Claire-IA !"
+      "Je m'appelle BB-IA !"
     ],
     "quel âge as-tu ?": [
       "J'ai 25 ans"

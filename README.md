@@ -1,4 +1,4 @@
-# 🤖 Claire-IA Conversational AI
+# 🤖 BB-IA Conversational AI
 
 A minimalist conversational AI built with Python and Streamlit that learns from user interactions in real-time.
 
@@ -78,7 +78,7 @@ Responsive UI - Mobile-first approach
 Real-time Learning - Immediate response updates
 
 🌐 Live Demo
-Try Claire-IA Live (Coming soon)
+Try BB-IA Live (Coming soon)
 🤝 Contributing
 
 Fork the repository
