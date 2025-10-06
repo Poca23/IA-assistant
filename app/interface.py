@@ -566,7 +566,13 @@ def maintenance_interface():
                 success = teach_ai(question, answer)
                 if success:
                     st.success(f"✅ BB-IA a appris !\n**Q:** {question}\n**R:** {answer}")
+                    
+                    # ✅ CORRECTION : Invalider le cache AVANT balloons
+                    st.cache_resource.clear()
+                    
                     st.balloons()
+                    time.sleep(1.5)
+                    st.rerun()  # ← Force rechargement avec nouvelles données
                 else:
                     st.error("❌ Erreur durant l'apprentissage")
             except Exception as e:
