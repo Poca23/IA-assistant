@@ -47,31 +47,35 @@ class AIBrain:
             if not user_input or len(user_input.strip()) == 0:
                 return "Pardon, je n'ai rien entendu. Pouvez-vous répéter ?"
             
+            # 🔹 1️⃣ PRIORITÉ : Vérifier learned_responses AVANT nettoyage
+            try:
+                learned = self.memory.get_learned_responses()
+                
+                # ✅ Correspondance exacte (insensible à la casse)
+                user_lower = user_input.lower().strip()
+                if user_lower in learned and learned[user_lower]:
+                    response = random.choice(learned[user_lower])
+                    self.memory.save_conversation(user_input, response)
+                    return response
+                
+                # ✅ Correspondance partielle (si pas de match exact)
+                for learned_key in learned.keys():
+                    if learned_key in user_lower or user_lower in learned_key:
+                        if learned[learned_key]:
+                            response = random.choice(learned[learned_key])
+                            self.memory.save_conversation(user_input, response)
+                            return response
+            
+            except Exception as memory_error:
+                print(f"❌ Erreur mémoire : {memory_error}")
+            
+            # 🔹 2️⃣ FALLBACK : Patterns par défaut
             cleaned_input = self.clean_input(user_input)
             
             if len(cleaned_input) == 0:
                 return "Je n'ai pas bien compris. Pouvez-vous reformuler ?"
             
-            try:
-                learned = self.memory.get_learned_responses()
-                if cleaned_input in learned and learned[cleaned_input]:
-                    response = random.choice(learned[cleaned_input])
-                else:
-                    partial_match = None
-                    for learned_key in learned.keys():
-                        if cleaned_input in learned_key or learned_key in cleaned_input:
-                            if learned[learned_key]:
-                                partial_match = random.choice(learned[learned_key])
-                                break
-                    
-                    if partial_match:
-                        response = partial_match
-                    else:
-                        response = self._get_pattern_response(cleaned_input)
-                        
-            except Exception as memory_error:
-                print(f"❌ Erreur mémoire : {memory_error}")
-                response = self._get_pattern_response(cleaned_input)
+            response = self._get_pattern_response(cleaned_input)
             
             try:
                 self.memory.save_conversation(user_input, response)
