@@ -109,6 +109,36 @@
       "user": "test 2 quick",
       "ai": "réponse 2 quick",
       "timestamp": "2025-10-06 18:36:51"
+    },
+    {
+      "user": "test quick",
+      "ai": "Reponse test",
+      "timestamp": "2025-10-06 18:38:45"
+    },
+    {
+      "user": "1 + 1 = ?",
+      "ai": "2",
+      "timestamp": "2025-10-06 18:39:25"
+    },
+    {
+      "user": "3 + 3 = ?",
+      "ai": "Peux-tu reformuler ?",
+      "timestamp": "2025-10-06 18:39:35"
+    },
+    {
+      "user": "Bonjour",
+      "ai": "Salut ! Comment ça va ?",
+      "timestamp": "2025-10-06 19:04:38"
+    },
+    {
+      "user": "Quel est la capitale de Paris ?",
+      "ai": "Peux-tu reformuler ?",
+      "timestamp": "2025-10-06 19:04:49"
+    },
+    {
+      "user": "Bonjour",
+      "ai": "Hey ! Ravi de te voir !",
+      "timestamp": "2025-10-06 19:05:00"
     }
   ],
   "learned_responses": {

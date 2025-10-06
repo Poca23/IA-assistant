@@ -35,29 +35,110 @@ def init_sync_export():
     return SyncExport()
 
 def chat_interface():
-    """Onglet Chat - Interface conversationnelle"""
+    """Onglet Chat - Interface conversationnelle responsive"""
+    
+    # CSS Custom pour layout chat moderne
+    st.markdown("""
+        <style>
+        /* Container messages scrollable avec hauteur fixe */
+        .chat-container {
+            height: calc(100vh - 350px);
+            min-height: 400px;
+            overflow-y: auto;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        /* Messages IA (gauche) */
+        [data-testid="stChatMessage"][data-role="assistant"] {
+            background: linear-gradient(135deg, #2b313e 0%, #1e2329 100%);
+            border-left: 3px solid #ff8c42;
+            margin-right: 20%;
+            border-radius: 12px 12px 12px 4px;
+        }
+        
+        /* Messages User (droite) */
+        [data-testid="stChatMessage"][data-role="user"] {
+            background: linear-gradient(135deg, #1f4788 0%, #163560 100%);
+            border-right: 3px solid #4da6ff;
+            margin-left: 20%;
+            border-radius: 12px 12px 4px 12px;
+        }
+        
+        /* Input zone fixe en bas */
+        [data-testid="stChatInput"] {
+            position: sticky;
+            bottom: 0;
+            background: #0e1117;
+            padding: 1rem 0;
+            border-top: 1px solid #262730;
+            z-index: 100;
+        }
+        
+        /* Responsive mobile */
+        @media (max-width: 768px) {
+            [data-testid="stChatMessage"][data-role="assistant"] {
+                margin-right: 10%;
+            }
+            [data-testid="stChatMessage"][data-role="user"] {
+                margin-left: 10%;
+            }
+            .chat-container {
+                height: calc(100vh - 300px);
+            }
+        }
+        
+        /* Auto-scroll smooth */
+        .chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-container::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #4da6ff;
+            border-radius: 4px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+    
+    # Initialisation session state
     if "messages" not in st.session_state:
         st.session_state.messages = []
         st.session_state.messages.append({
             "role": "assistant", 
             "content": "Salut ! Je suis BB-IA. Comment puis-je t'aider ?"
         })
-
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-    if prompt := st.chat_input("Écris ton message..."):
+    
+    # Container messages avec auto-scroll
+    messages_container = st.container()
+    
+    with messages_container:
+        # Affichage historique (haut → bas)
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+    
+    # Input fixe en bas
+    if prompt := st.chat_input("📝 Écris ton message..."):
+        # Ajouter message user
         with st.chat_message("user"):
             st.markdown(prompt)
         st.session_state.messages.append({"role": "user", "content": prompt})
-
+        
+        # Réponse IA
         with st.chat_message("assistant"):
-            with st.spinner("Je réfléchis..."):
+            with st.spinner("💭 Je réfléchis..."):
                 ai = init_ai()
                 response = ai.get_response(prompt)
                 st.markdown(response)
         st.session_state.messages.append({"role": "assistant", "content": response})
+        
+        # Force scroll vers le bas
+        st.rerun()
 
 def knowledge_interface():
     """Onglet Connaissances - Visualisation et gestion"""
@@ -442,7 +523,7 @@ def export_interface():
 
     st.divider()
 
-    # Section 3 : Restauration (✅ CORRECTION BALLOONS)
+    # Section 3 : Restauration
     with st.expander("📦 Restauration Backup"):
         backups_list = sync_export.get_backups_list()
 
@@ -490,10 +571,9 @@ def export_interface():
                     col2.metric("📊 Entrées", stats.get('entries_restored', 0))
                     col3.metric("⏱️ Durée", f"{stats.get('duration', 0):.2f}s")
 
-                    # ✅ CORRECTION : Balloons AVANT rerun
                     st.balloons()
-                    time.sleep(1.5)  # Pause pour voir animation
-                    
+                    time.sleep(1.5)
+
                     st.cache_resource.clear()
                     st.rerun()
                 else:
@@ -557,14 +637,13 @@ def maintenance_interface():
 
     st.divider()
 
-    # ✅ MESSAGE REDIRECTION
     st.info("""
     💡 **Pour enseigner à l'IA :**
-    
+
     Utilisez l'onglet **📚 Connaissances** :
     - Catégorie **Personal**
     - Sous-catégorie **Quick**
-    
+
     Vos apprentissages seront consultables et éditables !
     """)
 
@@ -591,10 +670,10 @@ def main():
     st.title("🤖 BB-IA")
     st.markdown("*Votre première IA qui apprend !*")
 
+    # CSS Global (garde styles actuels + nouveaux)
     st.markdown("""
     <style>
     .stApp { max-width: 100%; }
-    .stChatMessage { padding: 0.5rem; margin: 0.25rem 0; }
     .stTabs [data-baseweb="tab-list"] { gap: 2rem; }
     </style>
     """, unsafe_allow_html=True)
