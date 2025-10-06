@@ -94,6 +94,21 @@
       "user": "Qu'est-ce que Streamlit ?",
       "ai": "Intéressant ! Dis-moi en plus.",
       "timestamp": "2025-10-06 15:54:05"
+    },
+    {
+      "user": "Test quick",
+      "ai": "Reponse test",
+      "timestamp": "2025-10-06 18:35:27"
+    },
+    {
+      "user": "Test2 quick",
+      "ai": "Intéressant ! Dis-moi en plus.",
+      "timestamp": "2025-10-06 18:35:44"
+    },
+    {
+      "user": "test 2 quick",
+      "ai": "réponse 2 quick",
+      "timestamp": "2025-10-06 18:36:51"
     }
   ],
   "learned_responses": {

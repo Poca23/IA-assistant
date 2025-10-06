@@ -46,19 +46,41 @@ class AIBrain:
         try:
             if not user_input or len(user_input.strip()) == 0:
                 return "Pardon, je n'ai rien entendu. Pouvez-vous répéter ?"
+    
+            # 🔹 1️⃣ NOUVEAU : Chercher dans Knowledge Base
+            try:
+                from .knowledge import KnowledgeBase
+                kb = KnowledgeBase()
+                
+                user_lower = user_input.lower().strip()
+                
+                # Parcourir toutes les catégories
+                for main_cat in ["general", "personal"]:
+                    for sub_cat in kb.categories[main_cat]:
+                        entries = kb.read_entries(main_cat, sub_cat)
+                        
+                        for entry in entries:
+                            question_lower = entry["question"].lower().strip()
+                            
+                            # Match exact ou partiel
+                            if question_lower == user_lower or question_lower in    user_lower or user_lower in question_lower:
+                                response = entry["answer"]
+                                self.memory.save_conversation(user_input,   response)
+                                return response
             
-            # 🔹 1️⃣ PRIORITÉ : Vérifier learned_responses AVANT nettoyage
+            except Exception as kb_error:
+                print(f"⚠️ Knowledge Base non disponible : {kb_error}")
+    
+            # 🔹 2️⃣ FALLBACK : Vérifier learned_responses (legacy)
             try:
                 learned = self.memory.get_learned_responses()
-                
-                # ✅ Correspondance exacte (insensible à la casse)
                 user_lower = user_input.lower().strip()
+                
                 if user_lower in learned and learned[user_lower]:
                     response = random.choice(learned[user_lower])
                     self.memory.save_conversation(user_input, response)
                     return response
                 
-                # ✅ Correspondance partielle (si pas de match exact)
                 for learned_key in learned.keys():
                     if learned_key in user_lower or user_lower in learned_key:
                         if learned[learned_key]:
@@ -68,8 +90,8 @@ class AIBrain:
             
             except Exception as memory_error:
                 print(f"❌ Erreur mémoire : {memory_error}")
-            
-            # 🔹 2️⃣ FALLBACK : Patterns par défaut
+    
+            # 🔹 3️⃣ FALLBACK FINAL : Patterns par défaut
             cleaned_input = self.clean_input(user_input)
             
             if len(cleaned_input) == 0:
@@ -83,10 +105,11 @@ class AIBrain:
                 print(f"❌ Erreur sauvegarde conversation : {save_error}")
             
             return response
-            
+    
         except Exception as e:
             print(f"❌ Erreur get_response : {e}")
             return "Désolée, j'ai rencontré un problème. Pouvez-vous réessayer ?"
+
     
     def _get_pattern_response(self, cleaned_input):
         """Générer une réponse basée sur des motifs"""

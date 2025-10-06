@@ -9,11 +9,21 @@
       ],
       "created": "2025-10-06 15:49:26",
       "updated": "2025-10-06 15:49:26"
+    },
+    {
+      "id": "ba9b00a2",
+      "question": "test 2 quick",
+      "answer": "réponse 2 quick",
+      "tags": [
+        "test2"
+      ],
+      "created": "2025-10-06 18:36:12",
+      "updated": "2025-10-06 18:36:33"
     }
   ],
   "metadata": {
     "category": "quick",
-    "total_entries": 1,
-    "last_updated": "2025-10-06 15:49:26"
+    "total_entries": 2,
+    "last_updated": "2025-10-06 18:36:33"
   }
 }
