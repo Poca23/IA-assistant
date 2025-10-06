@@ -1,0 +1,19 @@
+{
+  "entries": [
+    {
+      "id": "7f128e9d",
+      "question": "Test quick",
+      "answer": "Reponse test",
+      "tags": [
+        "test"
+      ],
+      "created": "2025-10-06 15:49:26",
+      "updated": "2025-10-06 15:49:26"
+    }
+  ],
+  "metadata": {
+    "category": "quick",
+    "total_entries": 1,
+    "last_updated": "2025-10-06 15:49:26"
+  }
+}

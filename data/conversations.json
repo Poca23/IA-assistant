@@ -54,6 +54,46 @@
       "user": "2 + 2 = ?",
       "ai": "4",
       "timestamp": "2025-10-06 14:47:58"
+    },
+    {
+      "user": "test quick",
+      "ai": "Intéressant ! Dis-moi en plus.",
+      "timestamp": "2025-10-06 15:49:50"
+    },
+    {
+      "user": "Test quick",
+      "ai": "Peux-tu reformuler ?",
+      "timestamp": "2025-10-06 15:50:01"
+    },
+    {
+      "user": " Test quick",
+      "ai": "Intéressant ! Dis-moi en plus.",
+      "timestamp": "2025-10-06 15:51:04"
+    },
+    {
+      "user": "Recette pâtes ?",
+      "ai": "Je ne comprends pas encore, mais je vais apprendre !",
+      "timestamp": "2025-10-06 15:51:20"
+    },
+    {
+      "user": "Qu'est-ce que l'IA ?",
+      "ai": "Je ne comprends pas encore, mais je vais apprendre !",
+      "timestamp": "2025-10-06 15:51:37"
+    },
+    {
+      "user": "Qu'est-ce que l'IA ?",
+      "ai": "Je ne comprends pas encore, mais je vais apprendre !",
+      "timestamp": "2025-10-06 15:53:34"
+    },
+    {
+      "user": "Qu'est-ce que l'IA ?",
+      "ai": "Je ne comprends pas encore, mais je vais apprendre !",
+      "timestamp": "2025-10-06 15:53:46"
+    },
+    {
+      "user": "Qu'est-ce que Streamlit ?",
+      "ai": "Intéressant ! Dis-moi en plus.",
+      "timestamp": "2025-10-06 15:54:05"
     }
   ],
   "learned_responses": {

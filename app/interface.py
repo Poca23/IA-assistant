@@ -292,8 +292,8 @@ def import_advanced_interface():
         category = st.selectbox("Catégorie", ["general", "personal"], key="import_cat")
     with col2:
         subcategory = st.text_input("Sous-catégorie", 
-                                     placeholder="ex: technologies",
-                                     key="import_subcat")
+        placeholder="ex: technologies",
+        key="import_subcat")
 
     uploaded = st.file_uploader("Sélectionner JSON", type=["json"], key="import_file")
 
