@@ -8,7 +8,7 @@ class KnowledgeBase:
         self.base_path = "data/knowledge"
         self.categories = {
             "general": ["culture", "sciences", "technologies"],
-            "personal": ["cuisine", "admin", "sante", "budget"]
+            "personal": ["cuisine", "admin", "sante", "budget", "quick"]
         }
         self._ensure_structure()
     

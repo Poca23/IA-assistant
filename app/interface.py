@@ -62,6 +62,7 @@ def chat_interface():
 def knowledge_interface():
     """Onglet Connaissances - Visualisation et gestion"""
     st.header("📚 Base de Connaissances")
+    st.caption("🗂️ Documentation organisée avec catégoires, tags et recherche avancée")
 
     kb = init_kb()
     categories = kb.list_categories()
@@ -529,7 +530,7 @@ def export_interface():
             st.info("📭 Fichier logs introuvable")
 
 def maintenance_interface():
-    """Tab Maintenance"""
+    """Tab Maintenance - Simplifié"""
     st.subheader("🧹 Maintenance")
 
     col1, col2, col3 = st.columns(3)
@@ -556,29 +557,16 @@ def maintenance_interface():
 
     st.divider()
 
-    st.subheader("🎓 Enseigner à l'IA")
-    question = st.text_input("Question :", key="learn_question")
-    answer = st.text_input("Réponse :", key="learn_answer")
-
-    if st.button("🎓 Apprendre", type="primary", key="teach_btn"):
-        if question and answer:
-            try:
-                success = teach_ai(question, answer)
-                if success:
-                    st.success(f"✅ BB-IA a appris !\n**Q:** {question}\n**R:** {answer}")
-                    
-                    # ✅ CORRECTION : Invalider le cache AVANT balloons
-                    st.cache_resource.clear()
-                    
-                    st.balloons()
-                    time.sleep(1.5)
-                    st.rerun()  # ← Force rechargement avec nouvelles données
-                else:
-                    st.error("❌ Erreur durant l'apprentissage")
-            except Exception as e:
-                st.error(f"❌ Erreur : {str(e)}")
-        else:
-            st.error("⚠️ Veuillez remplir les deux champs")
+    # ✅ MESSAGE REDIRECTION
+    st.info("""
+    💡 **Pour enseigner à l'IA :**
+    
+    Utilisez l'onglet **📚 Connaissances** :
+    - Catégorie **Personal**
+    - Sous-catégorie **Quick**
+    
+    Vos apprentissages seront consultables et éditables !
+    """)
 
 def admin_interface():
     """Onglet Gestion"""
