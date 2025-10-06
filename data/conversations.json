@@ -14,6 +14,41 @@
       "user": "Quel est ton nom ?",
       "ai": "Je m'appelle BB-IA !",
       "timestamp": "2025-10-04 15:14:12"
+    },
+    {
+      "user": "Salut",
+      "ai": "Hey ! Ravi de te voir !",
+      "timestamp": "2025-10-06 14:16:44"
+    },
+    {
+      "user": "Comment ça va ?",
+      "ai": "Ça va bien, merci ! Et toi ?",
+      "timestamp": "2025-10-06 14:16:44"
+    },
+    {
+      "user": "Salut",
+      "ai": "Bonjour ! Que puis-je faire pour toi ?",
+      "timestamp": "2025-10-06 14:17:21"
+    },
+    {
+      "user": "Comment ça va ?",
+      "ai": "Ça va bien, merci ! Et toi ?",
+      "timestamp": "2025-10-06 14:17:21"
+    },
+    {
+      "user": "1 + 1 = ?",
+      "ai": "2",
+      "timestamp": "2025-10-06 14:17:21"
+    },
+    {
+      "user": "1 + 1 = ?",
+      "ai": "Je ne comprends pas encore, mais je vais apprendre !",
+      "timestamp": "2025-10-06 14:18:18"
+    },
+    {
+      "user": "1 + 1 = ?",
+      "ai": "Je ne comprends pas encore, mais je vais apprendre !",
+      "timestamp": "2025-10-06 14:19:41"
     }
   ],
   "learned_responses": {
@@ -34,6 +69,9 @@
     ],
     "âge": [
       "36 ans"
+    ],
+    "1 + 1 = ?": [
+      "2"
     ]
   }
 }
