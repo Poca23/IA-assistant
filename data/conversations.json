@@ -49,6 +49,11 @@
       "user": "1 + 1 = ?",
       "ai": "Je ne comprends pas encore, mais je vais apprendre !",
       "timestamp": "2025-10-06 14:19:41"
+    },
+    {
+      "user": "2 + 2 = ?",
+      "ai": "4",
+      "timestamp": "2025-10-06 14:47:58"
     }
   ],
   "learned_responses": {
@@ -72,6 +77,9 @@
     ],
     "1 + 1 = ?": [
       "2"
+    ],
+    "2 + 2 = ?": [
+      "4"
     ]
   }
 }
