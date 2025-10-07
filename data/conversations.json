@@ -139,6 +139,16 @@
       "user": "Bonjour",
       "ai": "Hey ! Ravi de te voir !",
       "timestamp": "2025-10-06 19:05:00"
+    },
+    {
+      "user": "test2 quick",
+      "ai": "Je ne comprends pas encore, mais je vais apprendre !",
+      "timestamp": "2025-10-07 08:13:01"
+    },
+    {
+      "user": "test 2 quick",
+      "ai": "réponse 2 quick",
+      "timestamp": "2025-10-07 08:13:21"
     }
   ],
   "learned_responses": {
