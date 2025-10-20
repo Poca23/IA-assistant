@@ -650,7 +650,6 @@ def export_interface():
                     col3.markdown(f"🕒 {log['timestamp'][:19]}")
 
                     if log.get("details"):
-                        # ✅ CORRECTION : Container au lieu de expander
                         st.markdown("**📋 Détails :**")
                         st.json(log["details"])
                     st.divider()
