@@ -12,33 +12,36 @@ from .sync_import import SyncImport
 from .sync_export import SyncExport
 
 st.set_page_config(
-    page_title="BB-IA",
-    page_icon="🤖",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    page_title="BB-IA", page_icon="🤖", layout="wide", initial_sidebar_state="expanded"
 )
+
 
 @st.cache_resource
 def init_ai():
     return AIBrain()
 
+
 @st.cache_resource
 def init_kb():
     return KnowledgeBase()
+
 
 @st.cache_resource
 def init_sync_import():
     return SyncImport()
 
+
 @st.cache_resource
 def init_sync_export():
     return SyncExport()
 
+
 def chat_interface():
     """Onglet Chat - Interface conversationnelle responsive"""
-    
+
     # CSS Custom pour layout chat moderne
-    st.markdown("""
+    st.markdown(
+        """
         <style>
         /* Container messages scrollable avec hauteur fixe */
         .chat-container {
@@ -103,32 +106,36 @@ def chat_interface():
             border-radius: 4px;
         }
         </style>
-    """, unsafe_allow_html=True)
-    
+    """,
+        unsafe_allow_html=True,
+    )
+
     # Initialisation session state
     if "messages" not in st.session_state:
         st.session_state.messages = []
-        st.session_state.messages.append({
-            "role": "assistant", 
-            "content": "Salut ! Je suis BB-IA. Comment puis-je t'aider ?"
-        })
-    
+        st.session_state.messages.append(
+            {
+                "role": "assistant",
+                "content": "Salut ! Je suis BB-IA. Comment puis-je t'aider ?",
+            }
+        )
+
     # Container messages avec auto-scroll
     messages_container = st.container()
-    
+
     with messages_container:
         # Affichage historique (haut → bas)
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
-    
+
     # Input fixe en bas
     if prompt := st.chat_input("📝 Écris ton message..."):
         # Ajouter message user
         with st.chat_message("user"):
             st.markdown(prompt)
         st.session_state.messages.append({"role": "user", "content": prompt})
-        
+
         # Réponse IA
         with st.chat_message("assistant"):
             with st.spinner("💭 Je réfléchis..."):
@@ -136,9 +143,10 @@ def chat_interface():
                 response = ai.get_response(prompt)
                 st.markdown(response)
         st.session_state.messages.append({"role": "assistant", "content": response})
-        
+
         # Force scroll vers le bas
         st.rerun()
+
 
 def knowledge_interface():
     """Onglet Connaissances - Visualisation et gestion"""
@@ -154,18 +162,18 @@ def knowledge_interface():
         st.subheader("🗂️ Catégories")
 
         selected_cat = st.radio(
-            "Catégorie principale:",
-            categories,
-            format_func=lambda x: f"📁 {x.title()}"
+            "Catégorie principale:", categories, format_func=lambda x: f"📁 {x.title()}"
         )
 
-        data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'knowledge', selected_cat)
+        data_path = os.path.join(
+            os.path.dirname(__file__), "..", "data", "knowledge", selected_cat
+        )
 
         if os.path.exists(data_path):
             subcategories = [
-                f.replace('.json', '') 
-                for f in os.listdir(data_path) 
-                if f.endswith('.json')
+                f.replace(".json", "")
+                for f in os.listdir(data_path)
+                if f.endswith(".json")
             ]
 
             if subcategories:
@@ -173,7 +181,7 @@ def knowledge_interface():
                 selected_subcat = st.radio(
                     "Sous-catégorie:",
                     subcategories,
-                    format_func=lambda x: f"📄 {x.title()}"
+                    format_func=lambda x: f"📄 {x.title()}",
                 )
             else:
                 selected_subcat = None
@@ -194,14 +202,16 @@ def knowledge_interface():
                     submitted = st.form_submit_button("➕ Ajouter", type="primary")
 
                     if submitted and new_question and new_answer:
-                        tags_list = [t.strip() for t in new_tags.split(",")] if new_tags else []
+                        tags_list = (
+                            [t.strip() for t in new_tags.split(",")] if new_tags else []
+                        )
 
                         success = kb.create_entry(
-                            selected_cat, 
+                            selected_cat,
                             selected_subcat,
                             new_question,
                             new_answer,
-                            tags_list
+                            tags_list,
                         )
 
                         if success:
@@ -220,42 +230,61 @@ def knowledge_interface():
                 elif isinstance(result, list) and len(result) > 0:
                     for idx, entry in enumerate(result):
                         if isinstance(entry, dict):
-                            entry_id = entry.get('id', f'unknown_{idx}')
-                            entry_title = str(entry.get('question', 'Sans titre'))
+                            entry_id = entry.get("id", f"unknown_{idx}")
+                            entry_title = str(entry.get("question", "Sans titre"))
 
                             col_content, col_actions = st.columns([5, 1])
 
                             with col_content:
                                 with st.expander(f"🔹 {entry_title}"):
                                     if f"edit_{entry_id}" not in st.session_state:
-                                        st.write(f"**Réponse:** {entry.get('answer', 'N/A')}")
-                                        tags = entry.get('tags', [])
+                                        st.write(
+                                            f"**Réponse:** {entry.get('answer', 'N/A')}"
+                                        )
+                                        tags = entry.get("tags", [])
                                         if tags:
-                                            st.caption(f"🏷️ Tags: {', '.join(map(str, tags))}")
-                                        st.caption(f"📅 Créé: {entry.get('created', 'N/A')}")
+                                            st.caption(
+                                                f"🏷️ Tags: {', '.join(map(str, tags))}"
+                                            )
+                                        st.caption(
+                                            f"📅 Créé: {entry.get('created', 'N/A')}"
+                                        )
                                     else:
                                         edit_question = st.text_input(
-                                            "Question :", 
-                                            value=entry.get('question', ''),
-                                            key=f"edit_q_{entry_id}"
+                                            "Question :",
+                                            value=entry.get("question", ""),
+                                            key=f"edit_q_{entry_id}",
                                         )
                                         edit_answer = st.text_area(
-                                            "Réponse :", 
-                                            value=entry.get('answer', ''),
+                                            "Réponse :",
+                                            value=entry.get("answer", ""),
                                             key=f"edit_a_{entry_id}",
-                                            height=150
+                                            height=150,
                                         )
                                         edit_tags = st.text_input(
-                                            "Tags :", 
-                                            value=', '.join(map(str, entry.get('tags', []))),
-                                            key=f"edit_t_{entry_id}"
+                                            "Tags :",
+                                            value=", ".join(
+                                                map(str, entry.get("tags", []))
+                                            ),
+                                            key=f"edit_t_{entry_id}",
                                         )
 
                                         col_save, col_cancel = st.columns(2)
 
                                         with col_save:
-                                            if st.button("💾 Sauvegarder", key=f"save_{entry_id}", type="primary"):
-                                                tags_list = [t.strip() for t in edit_tags.split(",")] if edit_tags else []
+                                            if st.button(
+                                                "💾 Sauvegarder",
+                                                key=f"save_{entry_id}",
+                                                type="primary",
+                                            ):
+                                                tags_list = (
+                                                    [
+                                                        t.strip()
+                                                        for t in edit_tags.split(",")
+                                                    ]
+                                                    if edit_tags
+                                                    else []
+                                                )
 
                                                 success = kb.update_entry(
                                                     selected_cat,
@@ -263,53 +292,76 @@ def knowledge_interface():
                                                     entry_id,
                                                     question=edit_question,
                                                     answer=edit_answer,
-                                                    tags=tags_list
+                                                    tags=tags_list,
                                                 )
 
                                                 if success:
-                                                    del st.session_state[f"edit_{entry_id}"]
-                                                    st.success("✅ Modifications sauvegardées !")
+                                                    del st.session_state[
+                                                        f"edit_{entry_id}"
+                                                    ]
+                                                    st.success(
+                                                        "✅ Modifications sauvegardées !"
+                                                    )
                                                     st.rerun()
                                                 else:
                                                     st.error("❌ Erreur sauvegarde")
 
                                         with col_cancel:
-                                            if st.button("❌ Annuler", key=f"cancel_{entry_id}"):
+                                            if st.button(
+                                                "❌ Annuler", key=f"cancel_{entry_id}"
+                                            ):
                                                 del st.session_state[f"edit_{entry_id}"]
                                                 st.rerun()
 
                             with col_actions:
                                 if f"edit_{entry_id}" not in st.session_state:
-                                    if st.button("✏️", key=f"btn_edit_{entry_id}", help="Modifier"):
+                                    if st.button(
+                                        "✏️", key=f"btn_edit_{entry_id}", help="Modifier"
+                                    ):
                                         st.session_state[f"edit_{entry_id}"] = True
                                         st.rerun()
 
                                 if f"confirm_del_{entry_id}" not in st.session_state:
-                                    if st.button("🗑️", key=f"btn_del_{entry_id}", help="Supprimer"):
-                                        st.session_state[f"confirm_del_{entry_id}"] = True
+                                    if st.button(
+                                        "🗑️", key=f"btn_del_{entry_id}", help="Supprimer"
+                                    ):
+                                        st.session_state[f"confirm_del_{entry_id}"] = (
+                                            True
+                                        )
                                         st.rerun()
 
-                                if st.session_state.get(f"confirm_del_{entry_id}", False):
+                                if st.session_state.get(
+                                    f"confirm_del_{entry_id}", False
+                                ):
                                     col_yes, col_no = st.columns(2)
 
                                     with col_yes:
-                                        if st.button("✓", key=f"yes_{entry_id}", help="Confirmer", type="primary"):
+                                        if st.button(
+                                            "✓",
+                                            key=f"yes_{entry_id}",
+                                            help="Confirmer",
+                                            type="primary",
+                                        ):
                                             success = kb.delete_entry(
-                                                selected_cat,
-                                                selected_subcat,
-                                                entry_id
+                                                selected_cat, selected_subcat, entry_id
                                             )
 
                                             if success:
-                                                del st.session_state[f"confirm_del_{entry_id}"]
+                                                del st.session_state[
+                                                    f"confirm_del_{entry_id}"
+                                                ]
                                                 st.success("✅ Entrée supprimée !")
                                                 st.rerun()
                                             else:
                                                 st.error("❌ Erreur suppression")
 
                                     with col_no:
-                                        if st.button("✗", key=f"no_{entry_id}", help="Annuler"):
-                                            del st.session_state[f"confirm_del_{entry_id}"]
+                                        if st.button(
+                                            "✗", key=f"no_{entry_id}", help="Annuler"
+                                        ):
+                                            del st.session_state[
+                                                f"confirm_del_{entry_id}"
+                                            ]
                                             st.rerun()
                         else:
                             st.warning(f"⚠️ Entrée invalide : {type(entry)}")
@@ -320,6 +372,7 @@ def knowledge_interface():
                 st.error(f"❌ Erreur lecture : {str(e)}")
         else:
             st.info("👈 Sélectionnez une catégorie et une sous-catégorie")
+
 
 def stats_interface():
     """Onglet Statistiques - Métriques"""
@@ -333,25 +386,23 @@ def stats_interface():
         conversations = ai.memory.load_conversations()
 
         with col1:
-            st.metric(
-                "💬 Conversations",
-                len(conversations.get('conversations', []))
-            )
+            st.metric("💬 Conversations", len(conversations.get("conversations", [])))
 
         with col2:
             st.metric(
-                "🎓 Réponses apprises",
-                len(conversations.get('learned_responses', {}))
+                "🎓 Réponses apprises", len(conversations.get("learned_responses", {}))
             )
 
         with col3:
             total_entries = 0
             for cat in kb.list_categories():
-                cat_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'knowledge', cat)
+                cat_path = os.path.join(
+                    os.path.dirname(__file__), "..", "data", "knowledge", cat
+                )
                 if os.path.exists(cat_path):
                     for subcat_file in os.listdir(cat_path):
-                        if subcat_file.endswith('.json'):
-                            subcat = subcat_file.replace('.json', '')
+                        if subcat_file.endswith(".json"):
+                            subcat = subcat_file.replace(".json", "")
                             entries = kb.read_entries(cat, subcat)
                             if isinstance(entries, list):
                                 total_entries += len(entries)
@@ -364,6 +415,7 @@ def stats_interface():
     except Exception as e:
         st.error(f"❌ Erreur chargement stats : {str(e)}")
 
+
 def import_advanced_interface():
     """Import avancé avec preview"""
     st.subheader("📥 Import Avancé")
@@ -372,9 +424,9 @@ def import_advanced_interface():
     with col1:
         category = st.selectbox("Catégorie", ["general", "personal"], key="import_cat")
     with col2:
-        subcategory = st.text_input("Sous-catégorie", 
-        placeholder="ex: technologies",
-        key="import_subcat")
+        subcategory = st.text_input(
+            "Sous-catégorie", placeholder="ex: technologies", key="import_subcat"
+        )
 
     uploaded = st.file_uploader("Sélectionner JSON", type=["json"], key="import_file")
 
@@ -404,12 +456,11 @@ def import_advanced_interface():
                     st.divider()
 
         if preview["new"] > 0:
-            if st.button("✅ Importer les nouvelles entrées", 
-                        type="primary",
-                        key="import_btn"):
+            if st.button(
+                "✅ Importer les nouvelles entrées", type="primary", key="import_btn"
+            ):
                 result = sync.merge_import(
-                    category, subcategory,
-                    preview["entries_to_import"]
+                    category, subcategory, preview["entries_to_import"]
                 )
 
                 if result["success"]:
@@ -419,6 +470,7 @@ def import_advanced_interface():
                     st.error(f"❌ Erreur: {result['error']}")
         else:
             st.info("ℹ️ Aucune nouvelle entrée à importer")
+
 
 def export_interface():
     """Tab Export & Backup"""
@@ -432,51 +484,55 @@ def export_interface():
 
         with col1:
             export_category = st.selectbox(
-                "Catégorie",
-                ["Toutes", "general", "personal"],
-                key="export_filter_cat"
+                "Catégorie", ["Toutes", "general", "personal"], key="export_filter_cat"
             )
             export_tags = st.text_input(
                 "Tags (séparés par virgules)",
                 key="export_tags",
-                placeholder="ex: python, ia"
+                placeholder="ex: python, ia",
             )
 
         with col2:
             export_subcategory = st.text_input(
                 "Sous-catégorie (optionnel)",
                 key="export_subcat",
-                placeholder="ex: technologies"
+                placeholder="ex: technologies",
             )
             export_date_from = st.date_input(
-                "Date début (optionnel)",
-                value=None,
-                key="export_date_from"
+                "Date début (optionnel)", value=None, key="export_date_from"
             )
 
         if st.button("📥 Générer Export", type="primary", key="export_btn"):
             with st.spinner("Génération export..."):
                 cat_filter = None if export_category == "Toutes" else export_category
                 subcat_filter = export_subcategory if export_subcategory else None
-                tags_filter = [t.strip() for t in export_tags.split(",")] if export_tags else None
-                date_filter = export_date_from.strftime("%Y-%m-%d") if export_date_from else None
+                tags_filter = (
+                    [t.strip() for t in export_tags.split(",")] if export_tags else None
+                )
+                date_filter = (
+                    export_date_from.strftime("%Y-%m-%d") if export_date_from else None
+                )
 
                 success, message, data = sync_export.export_by_filters(
                     category=cat_filter,
                     subcategory=subcat_filter,
                     tags=tags_filter,
-                    date_from=date_filter
+                    date_from=date_filter,
                 )
 
                 if success and data:
                     st.success(message)
 
                     with st.expander("👁️ Aperçu Export"):
-                        st.json({
-                            "total_entries": data["metadata"]["total_entries"],
-                            "filtres_appliqués": data["metadata"]["filters"],
-                            "premiere_entree": data["entries"][0] if data["entries"] else None
-                        })
+                        st.json(
+                            {
+                                "total_entries": data["metadata"]["total_entries"],
+                                "filtres_appliqués": data["metadata"]["filters"],
+                                "premiere_entree": (
+                                    data["entries"][0] if data["entries"] else None
+                                ),
+                            }
+                        )
 
                     json_str = json.dumps(data, indent=2, ensure_ascii=False)
 
@@ -485,7 +541,7 @@ def export_interface():
                         data=json_str,
                         file_name=f"export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
                         mime="application/json",
-                        key="download_export"
+                        key="download_export",
                     )
                 else:
                     st.error(message)
@@ -504,7 +560,7 @@ def export_interface():
                     st.success(message)
 
                     backup_file = Path(backup_path)
-                    size_mb = round(backup_file.stat().st_size / (1024*1024), 2)
+                    size_mb = round(backup_file.stat().st_size / (1024 * 1024), 2)
 
                     col1, col2 = st.columns(2)
                     col1.metric("📦 Taille", f"{size_mb} MB")
@@ -516,7 +572,7 @@ def export_interface():
                             data=f,
                             file_name=backup_file.name,
                             mime="application/zip",
-                            key="download_backup"
+                            key="download_backup",
                         )
                 else:
                     st.error(message)
@@ -539,7 +595,7 @@ def export_interface():
                 "Sélectionner un backup",
                 range(len(backup_options)),
                 format_func=lambda x: backup_options[x],
-                key="restore_select"
+                key="restore_select",
             )
 
             selected_backup = backups_list[selected_idx]
@@ -547,28 +603,31 @@ def export_interface():
             restore_mode = st.radio(
                 "Mode de restauration",
                 ["merge", "replace"],
-                format_func=lambda x: "🔀 Fusion (merge)" if x == "merge" else "🔄 Remplacement (replace)",
-                key="restore_mode"
+                format_func=lambda x: (
+                    "🔀 Fusion (merge)" if x == "merge" else "🔄 Remplacement (replace)"
+                ),
+                key="restore_mode",
             )
 
             if restore_mode == "merge":
                 st.info("ℹ️ Les doublons seront ignorés, nouvelles entrées ajoutées")
             else:
-                st.warning("⚠️ ATTENTION : Toutes les données actuelles seront supprimées !")
+                st.warning(
+                    "⚠️ ATTENTION : Toutes les données actuelles seront supprimées !"
+                )
 
             if st.button("🔄 Restaurer", type="primary", key="restore_btn"):
                 with st.spinner(f"Restauration {restore_mode}..."):
                     success, message, stats = sync_export.restore_from_backup(
-                        selected_backup["path"],
-                        mode=restore_mode
+                        selected_backup["path"], mode=restore_mode
                     )
 
                 if success:
                     st.success(message)
 
                     col1, col2, col3 = st.columns(3)
-                    col1.metric("📁 Fichiers", stats.get('files_restored', 0))
-                    col2.metric("📊 Entrées", stats.get('entries_restored', 0))
+                    col1.metric("📁 Fichiers", stats.get("files_restored", 0))
+                    col2.metric("📊 Entrées", stats.get("entries_restored", 0))
                     col3.metric("⏱️ Durée", f"{stats.get('duration', 0):.2f}s")
 
                     st.balloons()
@@ -588,7 +647,7 @@ def export_interface():
         logs_file = sync_export.logs_file
 
         if logs_file.exists():
-            with open(logs_file, 'r', encoding='utf-8') as f:
+            with open(logs_file, "r", encoding="utf-8") as f:
                 logs = json.load(f)
 
             if logs:
@@ -600,14 +659,15 @@ def export_interface():
                     col2.markdown(f"📊 {log['count']}")
                     col3.markdown(f"🕒 {log['timestamp'][:19]}")
 
-                    if log.get('details'):
+                    if log.get("details"):
                         with st.expander("Détails"):
-                            st.json(log['details'])
+                            st.json(log["details"])
                     st.divider()
             else:
                 st.info("📭 Aucune opération")
         else:
             st.info("📭 Fichier logs introuvable")
+
 
 def maintenance_interface():
     """Tab Maintenance - Simplifié"""
@@ -618,10 +678,12 @@ def maintenance_interface():
     with col1:
         if st.button("🆕 Nouvelle Conversation", key="new_conv"):
             st.session_state.messages = []
-            st.session_state.messages.append({
-                "role": "assistant", 
-                "content": "Nouvelle conversation ! Comment puis-je t'aider ?"
-            })
+            st.session_state.messages.append(
+                {
+                    "role": "assistant",
+                    "content": "Nouvelle conversation ! Comment puis-je t'aider ?",
+                }
+            )
             st.success("✅ Conversation réinitialisée")
             st.rerun()
 
@@ -637,7 +699,8 @@ def maintenance_interface():
 
     st.divider()
 
-    st.info("""
+    st.info(
+        """
     💡 **Pour enseigner à l'IA :**
 
     Utilisez l'onglet **📚 Connaissances** :
@@ -645,17 +708,17 @@ def maintenance_interface():
     - Sous-catégorie **Quick**
 
     Vos apprentissages seront consultables et éditables !
-    """)
+    """
+    )
+
 
 def admin_interface():
     """Onglet Gestion"""
     st.header("⚙️ Gestion")
 
-    tab1, tab2, tab3 = st.tabs([
-        "📥 Import Avancé", 
-        "📤 Export & Backup", 
-        "🧹 Maintenance"
-    ])
+    tab1, tab2, tab3 = st.tabs(
+        ["📥 Import Avancé", "📤 Export & Backup", "🧹 Maintenance"]
+    )
 
     with tab1:
         import_advanced_interface()
@@ -666,17 +729,21 @@ def admin_interface():
     with tab3:
         maintenance_interface()
 
+
 def main():
     st.title("🤖 BB-IA")
     st.markdown("*Votre première IA qui apprend !*")
 
     # CSS Global (garde styles actuels + nouveaux)
-    st.markdown("""
+    st.markdown(
+        """
     <style>
     .stApp { max-width: 100%; }
     .stTabs [data-baseweb="tab-list"] { gap: 2rem; }
     </style>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
     tabs = st.tabs(["💬 Chat", "📚 Connaissances", "📊 Statistiques", "⚙️ Gestion"])
 
@@ -691,6 +758,7 @@ def main():
 
     with tabs[3]:
         admin_interface()
+
 
 if __name__ == "__main__":
     main()
