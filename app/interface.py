@@ -38,12 +38,9 @@ def init_sync_export():
 
 def chat_interface():
     """Onglet Chat - Interface conversationnelle responsive"""
-
-    # CSS Custom pour layout chat moderne
     st.markdown(
         """
         <style>
-        /* Container messages scrollable avec hauteur fixe */
         .chat-container {
             height: calc(100vh - 350px);
             min-height: 400px;
@@ -54,24 +51,18 @@ def chat_interface():
             flex-direction: column;
             gap: 0.75rem;
         }
-
-        /* Messages IA (gauche) */
         [data-testid="stChatMessage"][data-role="assistant"] {
             background: linear-gradient(135deg, #2b313e 0%, #1e2329 100%);
             border-left: 3px solid #ff8c42;
             margin-right: 20%;
             border-radius: 12px 12px 12px 4px;
         }
-
-        /* Messages User (droite) */
         [data-testid="stChatMessage"][data-role="user"] {
             background: linear-gradient(135deg, #1f4788 0%, #163560 100%);
             border-right: 3px solid #4da6ff;
             margin-left: 20%;
             border-radius: 12px 12px 4px 12px;
         }
-
-        /* Input zone fixe en bas */
         [data-testid="stChatInput"] {
             position: sticky;
             bottom: 0;
@@ -80,8 +71,6 @@ def chat_interface():
             border-top: 1px solid #262730;
             z-index: 100;
         }
-
-        /* Responsive mobile */
         @media (max-width: 768px) {
             [data-testid="stChatMessage"][data-role="assistant"] {
                 margin-right: 10%;
@@ -93,8 +82,6 @@ def chat_interface():
                 height: calc(100vh - 300px);
             }
         }
-
-        /* Auto-scroll smooth */
         .chat-container::-webkit-scrollbar {
             width: 8px;
         }
@@ -110,7 +97,6 @@ def chat_interface():
         unsafe_allow_html=True,
     )
 
-    # Initialisation session state
     if "messages" not in st.session_state:
         st.session_state.messages = []
         st.session_state.messages.append(
@@ -120,31 +106,24 @@ def chat_interface():
             }
         )
 
-    # Container messages avec auto-scroll
     messages_container = st.container()
 
     with messages_container:
-        # Affichage historique (haut → bas)
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
-    # Input fixe en bas
     if prompt := st.chat_input("📝 Écris ton message..."):
-        # Ajouter message user
         with st.chat_message("user"):
             st.markdown(prompt)
         st.session_state.messages.append({"role": "user", "content": prompt})
 
-        # Réponse IA
         with st.chat_message("assistant"):
             with st.spinner("💭 Je réfléchis..."):
                 ai = init_ai()
                 response = ai.get_response(prompt)
                 st.markdown(response)
         st.session_state.messages.append({"role": "assistant", "content": response})
-
-        # Force scroll vers le bas
         st.rerun()
 
 
@@ -160,7 +139,6 @@ def knowledge_interface():
 
     with col1:
         st.subheader("🗂️ Catégories")
-
         selected_cat = st.radio(
             "Catégorie principale:", categories, format_func=lambda x: f"📁 {x.title()}"
         )
@@ -234,7 +212,6 @@ def knowledge_interface():
                             entry_title = str(entry.get("question", "Sans titre"))
 
                             with st.expander(f"🔹 {entry_title}"):
-                                # --- BOUTONS EN HAUT ---
                                 btn_col1, btn_col2 = st.columns(2)
 
                                 with btn_col1:
@@ -253,7 +230,6 @@ def knowledge_interface():
 
                                 st.divider()
 
-                                # --- MODE ÉDITION ---
                                 if edit_clicked:
                                     st.session_state[f"edit_{entry_id}"] = True
                                     st.rerun()
@@ -262,7 +238,6 @@ def knowledge_interface():
                                     st.session_state[f"confirm_del_{entry_id}"] = True
                                     st.rerun()
 
-                                # --- CONTENU AFFICHAGE/ÉDITION ---
                                 if f"edit_{entry_id}" in st.session_state:
                                     edit_question = st.text_input(
                                         "Question :",
@@ -328,7 +303,6 @@ def knowledge_interface():
                                             del st.session_state[f"edit_{entry_id}"]
                                             st.rerun()
 
-                                # --- CONFIRMATION SUPPRESSION ---
                                 elif st.session_state.get(
                                     f"confirm_del_{entry_id}", False
                                 ):
@@ -367,7 +341,6 @@ def knowledge_interface():
                                             ]
                                             st.rerun()
 
-                                # --- AFFICHAGE NORMAL ---
                                 else:
                                     st.write(
                                         f"**Réponse:** {entry.get('answer', 'N/A')}"
@@ -659,7 +632,7 @@ def export_interface():
 
     st.divider()
 
-    # Section 4 : Historique
+    # Section 4 : Historique ✅ CORRIGÉ
     with st.expander("📊 Historique Opérations"):
         logs_file = sync_export.logs_file
 
@@ -677,8 +650,9 @@ def export_interface():
                     col3.markdown(f"🕒 {log['timestamp'][:19]}")
 
                     if log.get("details"):
-                        with st.expander("Détails"):
-                            st.json(log["details"])
+                        # ✅ CORRECTION : Container au lieu de expander
+                        st.markdown("**📋 Détails :**")
+                        st.json(log["details"])
                     st.divider()
             else:
                 st.info("📭 Aucune opération")
@@ -751,7 +725,6 @@ def main():
     st.title("🤖 BB-IA")
     st.markdown("*Votre première IA qui apprend !*")
 
-    # CSS Global (garde styles actuels + nouveaux)
     st.markdown(
         """
     <style>
