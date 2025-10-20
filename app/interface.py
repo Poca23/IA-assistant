@@ -54,7 +54,7 @@ def chat_interface():
             flex-direction: column;
             gap: 0.75rem;
         }
-        
+
         /* Messages IA (gauche) */
         [data-testid="stChatMessage"][data-role="assistant"] {
             background: linear-gradient(135deg, #2b313e 0%, #1e2329 100%);
@@ -62,7 +62,7 @@ def chat_interface():
             margin-right: 20%;
             border-radius: 12px 12px 12px 4px;
         }
-        
+
         /* Messages User (droite) */
         [data-testid="stChatMessage"][data-role="user"] {
             background: linear-gradient(135deg, #1f4788 0%, #163560 100%);
@@ -70,7 +70,7 @@ def chat_interface():
             margin-left: 20%;
             border-radius: 12px 12px 4px 12px;
         }
-        
+
         /* Input zone fixe en bas */
         [data-testid="stChatInput"] {
             position: sticky;
@@ -80,7 +80,7 @@ def chat_interface():
             border-top: 1px solid #262730;
             z-index: 100;
         }
-        
+
         /* Responsive mobile */
         @media (max-width: 768px) {
             [data-testid="stChatMessage"][data-role="assistant"] {
@@ -93,7 +93,7 @@ def chat_interface():
                 height: calc(100vh - 300px);
             }
         }
-        
+
         /* Auto-scroll smooth */
         .chat-container::-webkit-scrollbar {
             width: 8px;
@@ -233,114 +233,115 @@ def knowledge_interface():
                             entry_id = entry.get("id", f"unknown_{idx}")
                             entry_title = str(entry.get("question", "Sans titre"))
 
-                            col_content, col_actions = st.columns([5, 1])
+                            with st.expander(f"🔹 {entry_title}"):
+                                # --- BOUTONS EN HAUT ---
+                                btn_col1, btn_col2 = st.columns(2)
 
-                            with col_content:
-                                with st.expander(f"🔹 {entry_title}"):
-                                    if f"edit_{entry_id}" not in st.session_state:
-                                        st.write(
-                                            f"**Réponse:** {entry.get('answer', 'N/A')}"
-                                        )
-                                        tags = entry.get("tags", [])
-                                        if tags:
-                                            st.caption(
-                                                f"🏷️ Tags: {', '.join(map(str, tags))}"
+                                with btn_col1:
+                                    edit_clicked = st.button(
+                                        "✏️ Modifier",
+                                        key=f"btn_edit_{entry_id}",
+                                        use_container_width=True,
+                                    )
+
+                                with btn_col2:
+                                    delete_clicked = st.button(
+                                        "🗑️ Supprimer",
+                                        key=f"btn_del_{entry_id}",
+                                        use_container_width=True,
+                                    )
+
+                                st.divider()
+
+                                # --- MODE ÉDITION ---
+                                if edit_clicked:
+                                    st.session_state[f"edit_{entry_id}"] = True
+                                    st.rerun()
+
+                                if delete_clicked:
+                                    st.session_state[f"confirm_del_{entry_id}"] = True
+                                    st.rerun()
+
+                                # --- CONTENU AFFICHAGE/ÉDITION ---
+                                if f"edit_{entry_id}" in st.session_state:
+                                    edit_question = st.text_input(
+                                        "Question :",
+                                        value=entry.get("question", ""),
+                                        key=f"edit_q_{entry_id}",
+                                    )
+                                    edit_answer = st.text_area(
+                                        "Réponse :",
+                                        value=entry.get("answer", ""),
+                                        key=f"edit_a_{entry_id}",
+                                        height=150,
+                                    )
+                                    edit_tags = st.text_input(
+                                        "Tags :",
+                                        value=", ".join(
+                                            map(str, entry.get("tags", []))
+                                        ),
+                                        key=f"edit_t_{entry_id}",
+                                    )
+
+                                    col_save, col_cancel = st.columns(2)
+
+                                    with col_save:
+                                        if st.button(
+                                            "💾 Sauvegarder",
+                                            key=f"save_{entry_id}",
+                                            type="primary",
+                                            use_container_width=True,
+                                        ):
+                                            tags_list = (
+                                                [
+                                                    t.strip()
+                                                    for t in edit_tags.split(",")
+                                                ]
+                                                if edit_tags
+                                                else []
                                             )
-                                        st.caption(
-                                            f"📅 Créé: {entry.get('created', 'N/A')}"
-                                        )
-                                    else:
-                                        edit_question = st.text_input(
-                                            "Question :",
-                                            value=entry.get("question", ""),
-                                            key=f"edit_q_{entry_id}",
-                                        )
-                                        edit_answer = st.text_area(
-                                            "Réponse :",
-                                            value=entry.get("answer", ""),
-                                            key=f"edit_a_{entry_id}",
-                                            height=150,
-                                        )
-                                        edit_tags = st.text_input(
-                                            "Tags :",
-                                            value=", ".join(
-                                                map(str, entry.get("tags", []))
-                                            ),
-                                            key=f"edit_t_{entry_id}",
-                                        )
 
-                                        col_save, col_cancel = st.columns(2)
+                                            success = kb.update_entry(
+                                                selected_cat,
+                                                selected_subcat,
+                                                entry_id,
+                                                question=edit_question,
+                                                answer=edit_answer,
+                                                tags=tags_list,
+                                            )
 
-                                        with col_save:
-                                            if st.button(
-                                                "💾 Sauvegarder",
-                                                key=f"save_{entry_id}",
-                                                type="primary",
-                                            ):
-                                                tags_list = (
-                                                    [
-                                                        t.strip()
-                                                        for t in edit_tags.split(",")
-                                                    ]
-                                                    if edit_tags
-                                                    else []
-                                                )
-
-                                                success = kb.update_entry(
-                                                    selected_cat,
-                                                    selected_subcat,
-                                                    entry_id,
-                                                    question=edit_question,
-                                                    answer=edit_answer,
-                                                    tags=tags_list,
-                                                )
-
-                                                if success:
-                                                    del st.session_state[
-                                                        f"edit_{entry_id}"
-                                                    ]
-                                                    st.success(
-                                                        "✅ Modifications sauvegardées !"
-                                                    )
-                                                    st.rerun()
-                                                else:
-                                                    st.error("❌ Erreur sauvegarde")
-
-                                        with col_cancel:
-                                            if st.button(
-                                                "❌ Annuler", key=f"cancel_{entry_id}"
-                                            ):
+                                            if success:
                                                 del st.session_state[f"edit_{entry_id}"]
+                                                st.success(
+                                                    "✅ Modifications sauvegardées !"
+                                                )
                                                 st.rerun()
+                                            else:
+                                                st.error("❌ Erreur sauvegarde")
 
-                            with col_actions:
-                                if f"edit_{entry_id}" not in st.session_state:
-                                    if st.button(
-                                        "✏️", key=f"btn_edit_{entry_id}", help="Modifier"
-                                    ):
-                                        st.session_state[f"edit_{entry_id}"] = True
-                                        st.rerun()
+                                    with col_cancel:
+                                        if st.button(
+                                            "❌ Annuler",
+                                            key=f"cancel_{entry_id}",
+                                            use_container_width=True,
+                                        ):
+                                            del st.session_state[f"edit_{entry_id}"]
+                                            st.rerun()
 
-                                if f"confirm_del_{entry_id}" not in st.session_state:
-                                    if st.button(
-                                        "🗑️", key=f"btn_del_{entry_id}", help="Supprimer"
-                                    ):
-                                        st.session_state[f"confirm_del_{entry_id}"] = (
-                                            True
-                                        )
-                                        st.rerun()
-
-                                if st.session_state.get(
+                                # --- CONFIRMATION SUPPRESSION ---
+                                elif st.session_state.get(
                                     f"confirm_del_{entry_id}", False
                                 ):
+                                    st.warning("⚠️ Confirmer la suppression ?")
+
                                     col_yes, col_no = st.columns(2)
 
                                     with col_yes:
                                         if st.button(
-                                            "✓",
+                                            "✓ Oui",
                                             key=f"yes_{entry_id}",
-                                            help="Confirmer",
                                             type="primary",
+                                            use_container_width=True,
                                         ):
                                             success = kb.delete_entry(
                                                 selected_cat, selected_subcat, entry_id
@@ -357,12 +358,28 @@ def knowledge_interface():
 
                                     with col_no:
                                         if st.button(
-                                            "✗", key=f"no_{entry_id}", help="Annuler"
+                                            "✗ Non",
+                                            key=f"no_{entry_id}",
+                                            use_container_width=True,
                                         ):
                                             del st.session_state[
                                                 f"confirm_del_{entry_id}"
                                             ]
                                             st.rerun()
+
+                                # --- AFFICHAGE NORMAL ---
+                                else:
+                                    st.write(
+                                        f"**Réponse:** {entry.get('answer', 'N/A')}"
+                                    )
+                                    tags = entry.get("tags", [])
+                                    if tags:
+                                        st.caption(
+                                            f"🏷️ Tags: {', '.join(map(str, tags))}"
+                                        )
+                                    st.caption(
+                                        f"📅 Créé: {entry.get('created', 'N/A')}"
+                                    )
                         else:
                             st.warning(f"⚠️ Entrée invalide : {type(entry)}")
                 else:
