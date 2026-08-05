@@ -1,5 +1,11 @@
 {
-  "conversations": [],
+  "conversations": [
+    {
+      "user": "J'ai quel âge ?",
+      "ai": "Je ne comprends pas encore, mais je vais apprendre !",
+      "timestamp": "2025-10-20 16:22:58"
+    }
+  ],
   "learned_responses": {
     "ton nom": [
       "Je m'appelle BB-IA !"
